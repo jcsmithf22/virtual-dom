@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly ELM_NPM_VERSION="0.19.1-6"
+
+echo "==> Ensuring Elm ${ELM_NPM_VERSION} is installed"
+if ! npm list --global "elm@${ELM_NPM_VERSION}" --depth=0 >/dev/null 2>&1; then
+  time npm install --global "elm@${ELM_NPM_VERSION}"
+fi
+
+echo "==> Fetching dependencies and validating the package"
+docs_file="$(mktemp --suffix=.json)"
+trap 'rm -f "$docs_file"' EXIT
+time elm make --docs="$docs_file"
+
+echo "==> Orb setup complete"
